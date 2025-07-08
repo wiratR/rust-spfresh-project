@@ -1,0 +1,26 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: rust-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/data:/app/backend/data  # สำหรับเก็บไฟล์ index และ metadata แบบ persistent
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        BACKEND_URL: http://localhost:8000
+    container_name: leptos-frontend
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend:/app  # สำหรับ live reload หรือแก้ไขโค้ด frontend แบบทันที
+    environment:
+      - BACKEND_URL=http://localhost:8000
+    depends_on:
+      - backend
